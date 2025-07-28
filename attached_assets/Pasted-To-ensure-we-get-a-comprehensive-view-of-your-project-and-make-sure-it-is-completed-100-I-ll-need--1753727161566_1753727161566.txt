@@ -1,0 +1,91 @@
+To ensure we get a comprehensive view of your project and make sure it is completed 100%, I’ll need to ask a series of detailed questions across different aspects of your project. These questions will cover functionality, design, user experience, technical setup, and marketing, among other things.
+
+### First Set of Questions: **Project Overview & Core Features**
+
+1. **What is the primary objective of the platform?**
+
+   * Is it to provide freelancers with tools for automating their job applications, managing tasks, and potentially outsourcing work?
+
+2. **What specific target audience are you focusing on?**
+
+   * Are you targeting new freelancers, experienced freelancers, or a different group (e.g., businesses looking to hire freelancers)?
+
+3. **How are you planning to handle the commission for the outsourcing feature?**
+
+   * How will you set the percentages, and how do you plan to automate the payment splits?
+
+4. **What features have you implemented so far?**
+
+   * What functionalities are already coded, and which ones are still in the development phase?
+
+5. **What additional features do you still need to integrate into the platform?**
+
+   * Are there any specific AI tools for automating job applications, invoice generation, or task management that need to be added?
+
+6. **How will you handle user sign-ups, logins, and data privacy?**
+
+   * Will users have the ability to sign in using Google/Facebook/other OAuth methods? Will there be a secure password reset functionality?
+
+7. **What’s the core user experience (UX) like for a freelancer?**
+
+   * How easy will it be for freelancers to sign up, input their portfolios, and start applying to jobs?
+
+### Second Set of Questions: **Design & User Interface**
+
+8. **How is the overall design of the website structured?**
+
+   * Do you have wireframes or mockups for each page (Landing page, dashboard, application page, etc.)?
+
+9. **What style/theme are you using?**
+
+   * Is the design minimalistic, modern, retro, etc.? What kind of branding and colors are you using to attract your target users?
+
+10. **Are there any specific animations or transitions you want to include?**
+
+    * For example, hover effects, loading animations, or visual effects to keep users engaged.
+
+11. **How will the user flow look from landing page to signing up and applying for jobs?**
+
+    * What will the path look like for freelancers to register, input their portfolio, and then apply for jobs via the platform?
+
+### Third Set of Questions: **Technology Stack & Back-End**
+
+12. **What backend technology are you using?**
+
+    * Are you using Node.js, Django, Ruby on Rails, or another stack? How do you plan to integrate databases for storing user data and job applications?
+
+13. **Do you have any plans to use third-party APIs for automating the application process?**
+
+    * For instance, using AI tools for generating proposals or automating client outreach.
+
+14. **Are you using any external tools for payment handling (e.g., Stripe, PayPal)?**
+
+    * How do you plan to manage payments between users and freelancers for completed jobs?
+
+15. **How will you handle scaling the website?**
+
+    * Do you anticipate scaling issues as user traffic grows? How are you planning to deal with performance optimization?
+
+### Fourth Set of Questions: **Testing, Deployment, & Launch**
+
+16. **What testing methods have you used or plan to use?**
+
+    * Have you implemented unit tests, integration tests, or manual QA testing?
+
+17. **How are you planning to deploy the platform?**
+
+    * Are you using a service like Vercel, Netlify, or AWS for deployment? How will the hosting handle spikes in traffic?
+
+18. **Are there any specific marketing strategies you have already planned for launch?**
+
+    * Will you be using social media, email marketing, SEO, or partnerships to promote the platform? Do you have a content strategy in place?
+
+19. **What are the next milestones you want to hit with the project?**
+
+    * Are you aiming to complete the MVP, launch the platform, or work on marketing materials first?
+
+---
+
+### Once you answer these questions, I’ll be able to compile all the responses and provide a detailed, actionable prompt to help you complete the project fully.
+
+Feel free to answer these one at a time or all together, and I'll refine the process to guide you toward the completion!
