@@ -21,6 +21,13 @@ export interface ProjectData {
   deadline?: Date;
   url: string;
   platform: string;
+  projectUrl?: string;
+  matchScore?: number;
+  competitionLevel?: 'low' | 'medium' | 'high';
+  successPrediction?: number;
+  recommendedBid?: number;
+  clientInsights?: any;
+  marketData?: any;
 }
 
 export interface ProposalSubmission {
