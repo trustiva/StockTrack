@@ -22,7 +22,7 @@ import {
   type InsertNotification,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc, and, or, gte, lte, ilike, inArray } from "drizzle-orm";
+import { eq, desc, and, or, gte, lte, ilike, inArray, sql } from "drizzle-orm";
 
 // Interface for storage operations
 export interface IStorage {
@@ -164,7 +164,7 @@ export class DatabaseStorage implements IStorage {
     if (filters?.skills && filters.skills.length > 0) {
       // This is a simplified overlap check - in production you'd want better array overlap
       conditions.push(or(...filters.skills.map(skill => 
-        ilike(projects.skills.toString(), `%${skill}%`)
+        sql`${projects.skills}::text ILIKE ${'%' + skill + '%'}`
       )));
     }
     
@@ -173,10 +173,10 @@ export class DatabaseStorage implements IStorage {
     }
     
     if (conditions.length > 0) {
-      query = query.where(and(...conditions));
+      return await db.select().from(projects).where(and(...conditions)).orderBy(desc(projects.createdAt)).limit(20);
     }
     
-    return await query.orderBy(desc(projects.createdAt)).limit(20);
+    return await db.select().from(projects).orderBy(desc(projects.createdAt)).limit(20);
   }
 
   async createProject(project: InsertProject): Promise<Project> {

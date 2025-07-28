@@ -474,7 +474,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         excludeKeywords
       };
 
-      const enhancedMatches = await geminiProjectDiscovery.enhanceProjectDiscovery(profile, searchCriteria);
+      const enhancedMatches = await geminiProjectDiscovery.enhanceProjectDiscovery(profile || null, searchCriteria);
       res.json(enhancedMatches);
     } catch (error) {
       console.error("Error in enhanced project search:", error);
