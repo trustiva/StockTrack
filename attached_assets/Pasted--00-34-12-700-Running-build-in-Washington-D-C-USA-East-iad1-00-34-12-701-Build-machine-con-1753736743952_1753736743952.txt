@@ -1,0 +1,92 @@
+[00:34:12.700] Running build in Washington, D.C., USA (East) – iad1
+[00:34:12.701] Build machine configuration: 2 cores, 8 GB
+[00:34:12.739] Cloning github.com/trustiva/StockTrack (Branch: main, Commit: 5f45a49)
+[00:34:12.882] Previous build caches not available
+[00:34:13.028] Cloning completed: 288.000ms
+[00:34:13.062] Found .vercelignore
+[00:34:13.069] Removed 35 ignored files defined in .vercelignore
+[00:34:13.069]   /.git/config
+[00:34:13.069]   /.git/description
+[00:34:13.069]   /.git/FETCH_HEAD
+[00:34:13.070]   /.git/HEAD
+[00:34:13.070]   /.git/hooks/applypatch-msg.sample
+[00:34:13.070]   /.git/hooks/commit-msg.sample
+[00:34:13.070]   /.git/hooks/fsmonitor-watchman.sample
+[00:34:13.070]   /.git/hooks/post-update.sample
+[00:34:13.070]   /.git/hooks/pre-applypatch.sample
+[00:34:13.070]   /.git/hooks/pre-commit.sample
+[00:34:14.849] Running "vercel build"
+[00:34:15.335] Vercel CLI 44.5.0
+[00:34:16.052] Running "install" command: `npm install`...
+[00:34:21.664] npm warn deprecated @esbuild-kit/esm-loader@2.6.5: Merged into tsx: https://tsx.is
+[00:34:21.767] npm warn deprecated @esbuild-kit/core-utils@3.3.2: Merged into tsx: https://tsx.is
+[00:34:28.811] 
+[00:34:28.812] added 591 packages, and audited 592 packages in 13s
+[00:34:28.813] 
+[00:34:28.813] 73 packages are looking for funding
+[00:34:28.814]   run `npm fund` for details
+[00:34:28.878] 
+[00:34:28.879] 14 vulnerabilities (3 low, 9 moderate, 2 high)
+[00:34:28.879] 
+[00:34:28.880] To address issues that do not require attention, run:
+[00:34:28.880]   npm audit fix
+[00:34:28.880] 
+[00:34:28.880] To address all issues (including breaking changes), run:
+[00:34:28.880]   npm audit fix --force
+[00:34:28.881] 
+[00:34:28.881] Run `npm audit` for details.
+[00:34:30.171] [36mvite v5.4.19 [32mbuilding for production...[36m[39m
+[00:34:30.226] transforming...
+[00:34:30.518] Browserslist: browsers data (caniuse-lite) is 9 months old. Please run:
+[00:34:30.520]   npx update-browserslist-db@latest
+[00:34:30.520]   Why you should do it regularly: https://github.com/browserslist/update-db#readme
+[00:34:35.989] [32m✓[39m 2391 modules transformed.
+[00:34:36.486] rendering chunks...
+[00:34:36.497] computing gzip size...
+[00:34:36.518] [2m../dist/public/[22m[32mindex.html                 [39m[1m[2m  0.63 kB[22m[1m[22m[2m │ gzip:   0.38 kB[22m
+[00:34:36.519] [2m../dist/public/[22m[2massets/[22m[35mindex-KUkH030q.css  [39m[1m[2m 71.24 kB[22m[1m[22m[2m │ gzip:  12.24 kB[22m
+[00:34:36.519] [2m../dist/public/[22m[2massets/[22m[36mindex-DRThsOWr.js   [39m[1m[33m697.67 kB[39m[22m[2m │ gzip: 204.87 kB[22m
+[00:34:36.519] [33m
+[00:34:36.519] (!) Some chunks are larger than 500 kB after minification. Consider:
+[00:34:36.519] - Using dynamic import() to code-split the application
+[00:34:36.519] - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+[00:34:36.519] - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.[39m
+[00:34:36.520] [32m✓ built in 6.33s[39m
+[00:34:36.586] Installing dependencies...
+[00:34:37.536] 
+[00:34:37.536] up to date in 890ms
+[00:34:37.536] 
+[00:34:37.536] 73 packages are looking for funding
+[00:34:37.536]   run `npm fund` for details
+[00:34:39.645] Using TypeScript 5.6.3 (local user-provided)
+[00:34:44.055] api/index.ts(39,55): error TS18046: 'error' is of type 'unknown'.
+[00:34:44.056] 
+[00:34:46.387] server/storage.ts(191,5): error TS2322: Type '{ id: string; title: string; description: string | null; platform: string; platformProjectId: string; budget: string | null; budgetType: string | null; skills: string[] | null; clientName: string | null; ... 6 more ...; updatedAt: Date | null; }[]' is not assignable to type '{ id: string; createdAt: Date | null; updatedAt: Date | null; skills: string[] | null; status: "open" | "in_progress" | "completed" | "cancelled" | null; title: string; description: string | null; ... 13 more ...; marketData: unknown; }[]'.
+[00:34:46.389]   Type '{ id: string; title: string; description: string | null; platform: string; platformProjectId: string; budget: string | null; budgetType: string | null; skills: string[] | null; clientName: string | null; ... 6 more ...; updatedAt: Date | null; }' is missing the following properties from type '{ id: string; createdAt: Date | null; updatedAt: Date | null; skills: string[] | null; status: "open" | "in_progress" | "completed" | "cancelled" | null; title: string; description: string | null; ... 13 more ...; marketData: unknown; }': competitionLevel, successPrediction, recommendedBid, clientInsights, marketData
+[00:34:46.389] 
+[00:34:46.691] server/services/automationEngine.ts(235,54): error TS2345: Argument of type 'ProjectData' is not assignable to parameter of type '{ id: string; createdAt: Date | null; updatedAt: Date | null; skills: string[] | null; status: "open" | "in_progress" | "completed" | "cancelled" | null; title: string; description: string | null; ... 13 more ...; marketData: unknown; }'.
+[00:34:46.691]   Type 'ProjectData' is missing the following properties from type '{ id: string; createdAt: Date | null; updatedAt: Date | null; skills: string[] | null; status: "open" | "in_progress" | "completed" | "cancelled" | null; title: string; description: string | null; ... 13 more ...; marketData: unknown; }': createdAt, updatedAt, status, platformProjectId, and 7 more.
+[00:34:46.692] server/services/automationEngine.ts(245,10): error TS2769: No overload matches this call.
+[00:34:46.692]   Overload 1 of 2, '(value: { userId: string | SQL<unknown> | Placeholder<string, any>; projectId: string | SQL<unknown> | Placeholder<string, any>; content: string | SQL<unknown> | Placeholder<...>; ... 14 more ...; optimizationData?: unknown; }): PgInsertBase<...>', gave the following error.
+[00:34:46.692]     Type '{ content: string; bidAmount: string; timeline: string; confidence: number; keyPoints: string[]; }' is not assignable to type 'string | SQL<unknown> | Placeholder<string, any>'.
+[00:34:46.692]   Overload 2 of 2, '(values: { userId: string | SQL<unknown> | Placeholder<string, any>; projectId: string | SQL<unknown> | Placeholder<string, any>; content: string | SQL<unknown> | Placeholder<...>; ... 14 more ...; optimizationData?: unknown; }[]): PgInsertBase<...>', gave the following error.
+[00:34:46.693]     Object literal may only specify known properties, and 'userId' does not exist in type '{ userId: string | SQL<unknown> | Placeholder<string, any>; projectId: string | SQL<unknown> | Placeholder<string, any>; content: string | SQL<unknown> | Placeholder<...>; ... 14 more ...; optimizationData?: unknown; }[]'.
+[00:34:46.693] server/services/automationEngine.ts(261,11): error TS2322: Type '{ content: string; bidAmount: string; timeline: string; confidence: number; keyPoints: string[]; }' is not assignable to type 'string'.
+[00:34:46.695] 
+[00:34:46.934] server/services/proposalTestingService.ts(31,7): error TS2739: Type '{ id: string; title: string; description: string; platform: string; platformProjectId: string; budget: string; budgetType: string; skills: string[]; clientName: string; clientRating: string; projectUrl: string; ... 4 more ...; updatedAt: Date; }' is missing the following properties from type '{ id: string; createdAt: Date | null; updatedAt: Date | null; skills: string[] | null; status: "open" | "in_progress" | "completed" | "cancelled" | null; title: string; description: string | null; ... 13 more ...; marketData: unknown; }': competitionLevel, successPrediction, recommendedBid, clientInsights, marketData
+[00:34:46.935] server/services/proposalTestingService.ts(56,7): error TS2739: Type '{ id: string; title: string; description: string; platform: string; platformProjectId: string; budget: string; budgetType: string; skills: string[]; clientName: string; clientRating: string; projectUrl: string; ... 4 more ...; updatedAt: Date; }' is missing the following properties from type '{ id: string; createdAt: Date | null; updatedAt: Date | null; skills: string[] | null; status: "open" | "in_progress" | "completed" | "cancelled" | null; title: string; description: string | null; ... 13 more ...; marketData: unknown; }': competitionLevel, successPrediction, recommendedBid, clientInsights, marketData
+[00:34:46.937] server/services/proposalTestingService.ts(81,7): error TS2739: Type '{ id: string; title: string; description: string; platform: string; platformProjectId: string; budget: string; budgetType: string; skills: string[]; clientName: string; clientRating: string; projectUrl: string; ... 4 more ...; updatedAt: Date; }' is missing the following properties from type '{ id: string; createdAt: Date | null; updatedAt: Date | null; skills: string[] | null; status: "open" | "in_progress" | "completed" | "cancelled" | null; title: string; description: string | null; ... 13 more ...; marketData: unknown; }': competitionLevel, successPrediction, recommendedBid, clientInsights, marketData
+[00:34:46.938] server/services/proposalTestingService.ts(106,7): error TS2739: Type '{ id: string; title: string; description: string; platform: string; platformProjectId: string; budget: string; budgetType: string; skills: string[]; clientName: string; clientRating: string; projectUrl: string; ... 4 more ...; updatedAt: Date; }' is missing the following properties from type '{ id: string; createdAt: Date | null; updatedAt: Date | null; skills: string[] | null; status: "open" | "in_progress" | "completed" | "cancelled" | null; title: string; description: string | null; ... 13 more ...; marketData: unknown; }': competitionLevel, successPrediction, recommendedBid, clientInsights, marketData
+[00:34:46.940] server/services/proposalTestingService.ts(131,7): error TS2739: Type '{ id: string; title: string; description: string; platform: string; platformProjectId: string; budget: string; budgetType: string; skills: string[]; clientName: string; clientRating: string; projectUrl: string; ... 4 more ...; updatedAt: Date; }' is missing the following properties from type '{ id: string; createdAt: Date | null; updatedAt: Date | null; skills: string[] | null; status: "open" | "in_progress" | "completed" | "cancelled" | null; title: string; description: string | null; ... 13 more ...; marketData: unknown; }': competitionLevel, successPrediction, recommendedBid, clientInsights, marketData
+[00:34:46.941] 
+[00:34:47.040] server/services/performanceOptimizer.ts(33,7): error TS2322: Type '(chunk?: any, encoding?: any) => void' is not assignable to type '{ (cb?: (() => void) | undefined): Response<any, Record<string, any>>; (chunk: any, cb?: (() => void) | undefined): Response<any, Record<string, any>>; (chunk: any, encoding: BufferEncoding, cb?: (() => void) | undefined): Response<...>; }'.
+[00:34:47.041]   Type 'void' is not assignable to type 'Response<any, Record<string, any>>'.
+[00:34:47.041] server/services/performanceOptimizer.ts(48,13): error TS2683: 'this' implicitly has type 'any' because it does not have a type annotation.
+[00:34:47.041] server/services/performanceOptimizer.ts(48,36): error TS2683: 'this' implicitly has type 'any' because it does not have a type annotation.
+[00:34:47.041] server/services/performanceOptimizer.ts(49,11): error TS2683: 'this' implicitly has type 'any' because it does not have a type annotation.
+[00:34:47.042] server/services/performanceOptimizer.ts(51,9): error TS2683: 'this' implicitly has type 'any' because it does not have a type annotation.
+[00:34:47.042] 
+[00:34:50.503] Build Completed in /vercel/output [34s]
+[00:34:50.694] Deploying outputs...
+[00:34:56.833] 
+[00:34:56.973] Deployment completed

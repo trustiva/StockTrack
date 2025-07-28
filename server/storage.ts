@@ -189,28 +189,12 @@ export class DatabaseStorage implements IStorage {
 
   async getProjectsByUser(userId: string): Promise<Project[]> {
     return await db
-      .select({
-        id: projects.id,
-        title: projects.title,
-        description: projects.description,
-        platform: projects.platform,
-        platformProjectId: projects.platformProjectId,
-        budget: projects.budget,
-        budgetType: projects.budgetType,
-        skills: projects.skills,
-        clientName: projects.clientName,
-        clientRating: projects.clientRating,
-        projectUrl: projects.projectUrl,
-        deadline: projects.deadline,
-        status: projects.status,
-        matchScore: projects.matchScore,
-        createdAt: projects.createdAt,
-        updatedAt: projects.updatedAt,
-      })
+      .select()
       .from(projects)
       .innerJoin(proposals, eq(projects.id, proposals.projectId))
       .where(eq(proposals.userId, userId))
-      .orderBy(desc(projects.createdAt));
+      .orderBy(desc(projects.createdAt))
+      .then(rows => rows.map(row => row.projects));
   }
 
   // Proposals

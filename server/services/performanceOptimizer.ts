@@ -29,8 +29,9 @@ export class PerformanceOptimizer {
       const startMemory = process.memoryUsage();
 
       // Override res.end to capture metrics
-      const originalEnd = res.end;
-      res.end = function(chunk?: any, encoding?: any) {
+      const originalEnd = res.end.bind(res);
+      const self = this;
+      res.end = function(this: Response, chunk?: any, encoding?: any, callback?: () => void) {
         const endTime = performance.now();
         const duration = endTime - startTime;
         
@@ -40,23 +41,23 @@ export class PerformanceOptimizer {
           method: req.method,
           duration,
           timestamp: new Date(),
-          statusCode: res.statusCode,
+          statusCode: this.statusCode,
           memoryUsage: process.memoryUsage()
         };
 
         // Add to metrics array (keep only recent ones)
-        if (this.metrics.length >= this.maxMetrics) {
-          this.metrics.shift();
+        if (self.metrics.length >= self.maxMetrics) {
+          self.metrics.shift();
         }
-        this.metrics.push(metric);
+        self.metrics.push(metric);
 
         // Log slow requests
         if (duration > 1000) { // Requests taking more than 1 second
           console.warn(`Slow request detected: ${req.method} ${req.path} - ${duration.toFixed(2)}ms`);
         }
 
-        originalEnd.call(res, chunk, encoding);
-      }.bind(this);
+        return originalEnd.call(this, chunk, encoding, callback);
+      };
 
       next();
     };
