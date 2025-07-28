@@ -8,7 +8,8 @@ import {
   User, 
   BarChart3, 
   Settings, 
-  Bot 
+  Bot,
+  Target
 } from "lucide-react";
 
 const navigation = [
@@ -28,14 +29,24 @@ const navigation = [
     icon: FileText,
   },
   {
-    name: "Profile",
-    href: "/profile",
+    name: "Portfolio",
+    href: "/portfolio",
     icon: User,
   },
   {
-    name: "Analytics",
+    name: "Bid Optimization",
+    href: "/bid-optimization",
+    icon: Target,
+  },
+  {
+    name: "Market Analytics",
     href: "/analytics",
     icon: BarChart3,
+  },
+  {
+    name: "Profile",
+    href: "/profile",
+    icon: User,
   },
   {
     name: "Settings",

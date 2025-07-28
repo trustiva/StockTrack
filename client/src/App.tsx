@@ -12,6 +12,8 @@ import Projects from "@/pages/projects";
 import Analytics from "@/pages/analytics";
 import Settings from "@/pages/settings";
 import AutomationSettings from "@/pages/automation-settings";
+import Portfolio from "@/pages/Portfolio";
+import BidOptimization from "@/pages/BidOptimization";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -28,6 +30,8 @@ function Router() {
           <Route path="/proposals" component={Proposals} />
           <Route path="/projects" component={Projects} />
           <Route path="/analytics" component={Analytics} />
+          <Route path="/portfolio" component={Portfolio} />
+          <Route path="/bid-optimization" component={BidOptimization} />
           <Route path="/settings" component={Settings} />
           <Route path="/automation" component={AutomationSettings} />
         </>

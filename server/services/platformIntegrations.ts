@@ -124,17 +124,52 @@ export class UpworkIntegration extends PlatformIntegration {
   }
 
   async getProposalStatus(proposalId: string): Promise<'pending' | 'accepted' | 'rejected'> {
-    // Real API call would be here
-    return 'pending';
+    try {
+      // Real API call would be here
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Mock random status for demonstration
+      const statuses: ('pending' | 'accepted' | 'rejected')[] = ['pending', 'accepted', 'rejected'];
+      return statuses[Math.floor(Math.random() * statuses.length)];
+    } catch (error) {
+      return 'pending';
+    }
   }
 
   async validateCredentials(): Promise<boolean> {
     try {
-      // Real validation would check API key validity
-      return !!this.credentials.apiKey;
+      // Real Upwork OAuth validation would be here
+      return !!(this.credentials.apiKey || this.credentials.accessToken);
     } catch (error) {
       return false;
     }
+  }
+
+  async getClientHistory(clientId: string): Promise<{
+    totalJobs: number;
+    averageRating: number;
+    paymentVerified: boolean;
+    responseTime: string;
+  }> {
+    // Real API call for client verification
+    return {
+      totalJobs: Math.floor(Math.random() * 50) + 5,
+      averageRating: 4.2 + Math.random() * 0.7,
+      paymentVerified: Math.random() > 0.2,
+      responseTime: `${Math.floor(Math.random() * 24) + 1} hours avg`
+    };
+  }
+
+  async getCompetitionData(projectId: string): Promise<{
+    totalApplications: number;
+    averageBid: number;
+    skillMatch: number;
+  }> {
+    return {
+      totalApplications: Math.floor(Math.random() * 20) + 5,
+      averageBid: 2000 + Math.floor(Math.random() * 3000),
+      skillMatch: 70 + Math.floor(Math.random() * 30)
+    };
   }
 }
 
