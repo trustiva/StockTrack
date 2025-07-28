@@ -68,6 +68,14 @@ export interface IStorage {
     monthlyEarnings: number;
     autoApplications: number;
   }>;
+  
+  // Additional methods for new features
+  getProposalById(id: string, userId: string): Promise<Proposal | undefined>;
+  getProjectById(id: string): Promise<Project | undefined>;
+  deletePlatformConnection(id: string, userId: string): Promise<void>;
+  getAnalyticsOverview(userId: string, timeframe: string): Promise<any>;
+  getProposalPerformance(userId: string): Promise<any>;
+  getEarningsForecast(userId: string): Promise<any>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -348,6 +356,138 @@ export class DatabaseStorage implements IStorage {
       successRate,
       monthlyEarnings,
       autoApplications,
+    };
+  }
+
+  // Additional method implementations for new features
+  async getProposalById(id: string, userId: string): Promise<Proposal | undefined> {
+    const [proposal] = await db
+      .select()
+      .from(proposals)
+      .where(and(eq(proposals.id, id), eq(proposals.userId, userId)));
+    return proposal;
+  }
+
+  async getProjectById(id: string): Promise<Project | undefined> {
+    const [project] = await db
+      .select()
+      .from(projects)
+      .where(eq(projects.id, id));
+    return project;
+  }
+
+  async deletePlatformConnection(id: string, userId: string): Promise<void> {
+    await db
+      .delete(platformConnections)
+      .where(and(eq(platformConnections.id, id), eq(platformConnections.userId, userId)));
+  }
+
+  async getAnalyticsOverview(userId: string, timeframe: string): Promise<any> {
+    const now = new Date();
+    let startDate = new Date();
+    
+    switch (timeframe) {
+      case '7d':
+        startDate.setDate(now.getDate() - 7);
+        break;
+      case '30d':
+        startDate.setDate(now.getDate() - 30);
+        break;
+      case '90d':
+        startDate.setDate(now.getDate() - 90);
+        break;
+      default:
+        startDate.setDate(now.getDate() - 30);
+    }
+
+    const userProposals = await db
+      .select()
+      .from(proposals)
+      .where(and(
+        eq(proposals.userId, userId),
+        gte(proposals.createdAt, startDate)
+      ));
+
+    const userProjects = await db
+      .select()
+      .from(projects)
+      .where(gte(projects.createdAt, startDate));
+
+    return {
+      totalProposals: userProposals.length,
+      acceptedProposals: userProposals.filter(p => p.status === 'accepted').length,
+      rejectedProposals: userProposals.filter(p => p.status === 'rejected').length,
+      pendingProposals: userProposals.filter(p => p.status === 'pending').length,
+      totalEarnings: userProposals
+        .filter(p => p.status === 'accepted')
+        .reduce((sum, p) => sum + (Number(p.bidAmount) || 0), 0),
+      newProjects: userProjects.length,
+      avgMatchScore: userProjects.length > 0 ? 
+        userProjects.reduce((sum, p) => sum + (p.matchScore || 0), 0) / userProjects.length : 0
+    };
+  }
+
+  async getProposalPerformance(userId: string): Promise<any> {
+    const userProposals = await db
+      .select()
+      .from(proposals)
+      .where(eq(proposals.userId, userId))
+      .orderBy(desc(proposals.createdAt));
+
+    const weeklyData = [];
+    const now = new Date();
+    
+    for (let i = 0; i < 12; i++) {
+      const weekStart = new Date(now.getTime() - (i * 7 * 24 * 60 * 60 * 1000));
+      const weekEnd = new Date(weekStart.getTime() + (7 * 24 * 60 * 60 * 1000));
+      
+      const weekProposals = userProposals.filter(p => 
+        p.createdAt && p.createdAt >= weekStart && p.createdAt < weekEnd
+      );
+
+      weeklyData.unshift({
+        week: `Week ${i + 1}`,
+        proposals: weekProposals.length,
+        accepted: weekProposals.filter(p => p.status === 'accepted').length,
+        rejected: weekProposals.filter(p => p.status === 'rejected').length,
+        pending: weekProposals.filter(p => p.status === 'pending').length
+      });
+    }
+
+    return {
+      weeklyData,
+      totalProposals: userProposals.length,
+      overallSuccessRate: userProposals.length > 0 ? 
+        (userProposals.filter(p => p.status === 'accepted').length / userProposals.length) * 100 : 0
+    };
+  }
+
+  async getEarningsForecast(userId: string): Promise<any> {
+    const userProposals = await db
+      .select()
+      .from(proposals)
+      .where(eq(proposals.userId, userId));
+
+    const acceptedProposals = userProposals.filter(p => p.status === 'accepted');
+    const pendingProposals = userProposals.filter(p => p.status === 'pending');
+
+    const avgSuccessRate = userProposals.length > 0 ? 
+      acceptedProposals.length / userProposals.length : 0.2;
+
+    const avgEarningsPerProject = acceptedProposals.length > 0 ?
+      acceptedProposals.reduce((sum, p) => sum + (Number(p.bidAmount) || 0), 0) / acceptedProposals.length :
+      1500;
+
+    const forecastedEarnings = pendingProposals.length * avgSuccessRate * avgEarningsPerProject;
+
+    return {
+      currentMonth: acceptedProposals
+        .filter(p => p.createdAt && p.createdAt.getMonth() === new Date().getMonth())
+        .reduce((sum, p) => sum + (Number(p.bidAmount) || 0), 0),
+      forecastedEarnings: Math.round(forecastedEarnings),
+      pendingValue: pendingProposals.reduce((sum, p) => sum + (Number(p.bidAmount) || 0), 0),
+      avgProjectValue: Math.round(avgEarningsPerProject),
+      successRate: Math.round(avgSuccessRate * 100)
     };
   }
 }

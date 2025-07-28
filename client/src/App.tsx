@@ -11,6 +11,7 @@ import Proposals from "@/pages/proposals";
 import Projects from "@/pages/projects";
 import Analytics from "@/pages/analytics";
 import Settings from "@/pages/settings";
+import AutomationSettings from "@/pages/automation-settings";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -28,6 +29,7 @@ function Router() {
           <Route path="/projects" component={Projects} />
           <Route path="/analytics" component={Analytics} />
           <Route path="/settings" component={Settings} />
+          <Route path="/automation" component={AutomationSettings} />
         </>
       )}
       <Route component={NotFound} />

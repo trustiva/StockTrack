@@ -10,6 +10,9 @@ import {
 } from "@shared/schema";
 import { generateProposal } from "./services/openai";
 import { searchProjects } from "./services/projectSearch";
+import { automationEngine } from "./services/automationEngine";
+import { notificationService } from "./services/notificationService";
+import { PlatformService } from "./services/platformIntegrations";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware
@@ -234,6 +237,222 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error marking notification as read:", error);
       res.status(500).json({ message: "Failed to mark notification as read" });
+    }
+  });
+
+  // Automation routes
+  app.get('/api/automation/status', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const status = await automationEngine.getAutomationStatus(userId);
+      res.json(status);
+    } catch (error) {
+      console.error("Error fetching automation status:", error);
+      res.status(500).json({ message: "Failed to fetch automation status" });
+    }
+  });
+
+  app.post('/api/automation/start', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      await automationEngine.startAutomation(userId);
+      res.json({ message: "Automation started successfully" });
+    } catch (error) {
+      console.error("Error starting automation:", error);
+      res.status(500).json({ message: "Failed to start automation" });
+    }
+  });
+
+  app.post('/api/automation/stop', isAuthenticated, async (req: any, res) => {
+    try {
+      await automationEngine.stopAutomation();
+      res.json({ message: "Automation stopped successfully" });
+    } catch (error) {
+      console.error("Error stopping automation:", error);
+      res.status(500).json({ message: "Failed to stop automation" });
+    }
+  });
+
+  app.post('/api/automation/run-manual', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      await automationEngine.runManualCycle(userId);
+      res.json({ message: "Manual automation cycle completed" });
+    } catch (error) {
+      console.error("Error running manual automation:", error);
+      res.status(500).json({ message: "Failed to run manual automation" });
+    }
+  });
+
+  // Notification routes
+  app.get('/api/notifications', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const limit = parseInt(req.query.limit as string) || 20;
+      const notifications = await notificationService.getUserNotifications(userId, limit);
+      res.json(notifications);
+    } catch (error) {
+      console.error("Error fetching notifications:", error);
+      res.status(500).json({ message: "Failed to fetch notifications" });
+    }
+  });
+
+  app.put('/api/notifications/:id/read', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const notificationId = req.params.id;
+      await notificationService.markAsRead(notificationId, userId);
+      res.json({ message: "Notification marked as read" });
+    } catch (error) {
+      console.error("Error marking notification as read:", error);
+      res.status(500).json({ message: "Failed to mark notification as read" });
+    }
+  });
+
+  app.put('/api/notifications/read-all', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      await notificationService.markAllAsRead(userId);
+      res.json({ message: "All notifications marked as read" });
+    } catch (error) {
+      console.error("Error marking all notifications as read:", error);
+      res.status(500).json({ message: "Failed to mark all notifications as read" });
+    }
+  });
+
+  app.get('/api/notifications/unread-count', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const count = await notificationService.getUnreadCount(userId);
+      res.json({ count });
+    } catch (error) {
+      console.error("Error fetching unread count:", error);
+      res.status(500).json({ message: "Failed to fetch unread count" });
+    }
+  });
+
+  // Platform connection routes
+  app.get('/api/platform-connections', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const connections = await storage.getPlatformConnections(userId);
+      res.json(connections);
+    } catch (error) {
+      console.error("Error fetching platform connections:", error);
+      res.status(500).json({ message: "Failed to fetch platform connections" });
+    }
+  });
+
+  app.post('/api/platform-connections', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { platform, credentials } = req.body;
+      
+      const connection = await storage.createPlatformConnection({
+        userId,
+        platform,
+        credentials,
+        isActive: true
+      });
+      
+      res.json(connection);
+    } catch (error) {
+      console.error("Error creating platform connection:", error);
+      res.status(500).json({ message: "Failed to create platform connection" });
+    }
+  });
+
+  app.delete('/api/platform-connections/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const connectionId = req.params.id;
+      await storage.deletePlatformConnection(connectionId, userId);
+      res.json({ message: "Platform connection deleted" });
+    } catch (error) {
+      console.error("Error deleting platform connection:", error);
+      res.status(500).json({ message: "Failed to delete platform connection" });
+    }
+  });
+
+  // Analytics routes
+  app.get('/api/analytics/overview', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const timeframe = req.query.timeframe as string || '30d';
+      const analytics = await storage.getAnalyticsOverview(userId, timeframe);
+      res.json(analytics);
+    } catch (error) {
+      console.error("Error fetching analytics overview:", error);
+      res.status(500).json({ message: "Failed to fetch analytics overview" });
+    }
+  });
+
+  app.get('/api/analytics/proposal-performance', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const performance = await storage.getProposalPerformance(userId);
+      res.json(performance);
+    } catch (error) {
+      console.error("Error fetching proposal performance:", error);
+      res.status(500).json({ message: "Failed to fetch proposal performance" });
+    }
+  });
+
+  app.get('/api/analytics/earnings-forecast', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const forecast = await storage.getEarningsForecast(userId);
+      res.json(forecast);
+    } catch (error) {
+      console.error("Error fetching earnings forecast:", error);
+      res.status(500).json({ message: "Failed to fetch earnings forecast" });
+    }
+  });
+
+  // Proposal auto-submission route
+  app.post('/api/proposals/:id/submit', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const proposalId = req.params.id;
+      
+      // Get proposal and project details
+      const proposal = await storage.getProposalById(proposalId, userId);
+      if (!proposal) {
+        return res.status(404).json({ message: "Proposal not found" });
+      }
+      
+      const project = await storage.getProjectById(proposal.projectId);
+      if (!project) {
+        return res.status(404).json({ message: "Project not found" });
+      }
+      
+      // Submit via platform service
+      const platformService = new PlatformService();
+      const result = await platformService.submitProposal(project.platform, {
+        projectId: project.platformProjectId,
+        content: proposal.content,
+        bidAmount: Number(proposal.bidAmount),
+        timeline: proposal.proposedTimeline || "2-3 weeks"
+      });
+      
+      if (result.success) {
+        // Update proposal status
+        await storage.updateProposal(proposalId, { sentAt: new Date() });
+        
+        // Create notification
+        await notificationService.createNotification({
+          userId,
+          title: "Proposal Submitted",
+          message: `Successfully submitted proposal for: ${project.title}`,
+          type: "proposal_update",
+          data: { proposalId, projectId: project.id }
+        });
+      }
+      
+      res.json(result);
+    } catch (error) {
+      console.error("Error submitting proposal:", error);
+      res.status(500).json({ message: "Failed to submit proposal" });
     }
   });
 

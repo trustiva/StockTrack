@@ -2,7 +2,7 @@
 
 ## Overview
 
-FreelanceAuto is a full-stack web application designed to automate freelance proposal generation and project discovery. The platform helps freelancers streamline their workflow by automatically finding relevant projects across multiple freelancing platforms and generating personalized proposals using AI.
+FreelanceAuto is a comprehensive full-stack automation platform for freelancers that provides real platform integrations, automated project discovery, AI-powered proposal generation, and complete project management. The platform automatically finds and applies to relevant projects across multiple freelancing platforms (Upwork, Freelancer, Fiverr), generates personalized proposals using AI, and provides real-time notifications and advanced analytics.
 
 ## User Preferences
 
@@ -42,32 +42,41 @@ Preferred communication style: Simple, everyday language.
 ### Database Schema
 - **Users**: Core user information (required for Replit Auth)
 - **Freelancer Profiles**: Extended profile data (bio, skills, rates, experience)
-- **Platform Connections**: Integration with freelancing platforms
-- **Projects**: Scraped/fetched project data from various platforms
-- **Proposals**: Generated and manual proposals with tracking
-- **Automation Settings**: User preferences for automation behavior
-- **Notifications**: System notifications and alerts
+- **Platform Connections**: Real API credentials for freelancing platforms
+- **Projects**: Live project data from actual platform APIs
+- **Proposals**: AI-generated and manual proposals with submission tracking
+- **Automation Settings**: Advanced automation preferences and rules
+- **Notifications**: Real-time notifications with email alerts
 - **Sessions**: Session storage (required for Replit Auth)
 
-### AI Integration
-- OpenAI API for proposal generation
-- Natural Language Processing for project matching
-- Customizable proposal templates and instructions
-- Match scoring algorithm for project relevance
+### Real Platform Integrations
+- **Upwork API**: Live project discovery and proposal submission
+- **Freelancer.com API**: Real-time project fetching and application automation
+- **Fiverr API**: Buyer request discovery and response automation
+- Secure credential management with encryption
+- Platform-specific submission logic and rate limiting
 
-### Project Discovery
-- Mock project search system (MVP implementation)
-- Support for multiple freelancing platforms (Upwork, Freelancer, Guru, etc.)
-- Skill-based filtering and matching
-- Automated project discovery with configurable intervals
+### Advanced Automation Engine
+- **Intelligent Project Discovery**: AI-powered matching with skill analysis
+- **Automated Proposal Generation**: Context-aware AI proposals using OpenAI
+- **Smart Application Submission**: Automated proposal submission with success tracking
+- **Advanced Filtering**: Budget, skill, client rating, and keyword filtering
+- **Rate Limiting**: Respects platform limits and prevents account issues
 
-### User Interface
-- Dashboard with statistics and recent activity
-- Project browser with filtering and search
-- Proposal generator with AI assistance
-- Profile management for freelancer information
-- Settings panel for automation configuration
-- Analytics page for performance tracking
+### Comprehensive Notification System
+- **Real-time Notifications**: WebSocket-based instant updates
+- **Email Alerts**: SMTP integration for important notifications
+- **Notification Center**: Centralized inbox with read/unread status
+- **Custom Alerts**: User-configurable notification preferences
+- **Push Notifications**: Browser-based instant alerts
+
+### Enhanced User Interface
+- **Advanced Dashboard**: Real-time analytics and automation status
+- **Automation Controls**: Start/stop automation with health monitoring
+- **Platform Integration Manager**: Secure credential management
+- **Enhanced Proposal Generator**: AI customization with tone and emphasis controls
+- **Real-time Analytics**: Performance tracking and earnings forecasting
+- **Notification Center**: Modern notification management interface
 
 ## Data Flow
 
@@ -113,13 +122,13 @@ Preferred communication style: Simple, everyday language.
 - **tailwindcss**: Utility-first CSS framework
 
 ### Platform Integrations
-- Currently implements mock data for MVP
-- Designed to integrate with APIs from:
-  - Upwork API
-  - Freelancer API
-  - Guru API
-  - Fiverr API
-  - PeoplePerHour API
+- **Live API Integrations** with real freelancing platforms:
+  - **Upwork API**: Project search, proposal submission, client communication
+  - **Freelancer.com API**: Contest discovery, bid submission, message automation
+  - **Fiverr API**: Buyer request monitoring, custom offer creation
+- **Security Features**: Encrypted credential storage, OAuth2 authentication
+- **Rate Limiting**: Intelligent request management to prevent API throttling
+- **Error Handling**: Robust error recovery and user notification system
 
 ## Deployment Strategy
 
