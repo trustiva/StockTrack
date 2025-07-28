@@ -7,20 +7,24 @@ const app = express();
 
 // Add CORS headers
 app.use((req, res, next) => {
+  // Get the current Replit domain from environment
+  const replitDomains = process.env.REPLIT_DOMAINS?.split(',') || [];
   const allowedOrigins = [
     'http://localhost:5000',
-    'https://9d17f577-ed02-4a4d-9a91-c46ed5a360f0-00-1zz21d4zj2ra2.janeway.replit.dev',
-    'https://9d17f577-ed02-4a4d-9a91-c46ed5a360f0-00-1zz21d4zj2ra2.janeway.replit.dev:5000'
+    `https://${process.env.REPL_ID}.repl.co`,
+    ...replitDomains.map(domain => `https://${domain}`),
+    ...replitDomains.map(domain => `https://${domain}:5000`)
   ];
   
   const origin = req.headers.origin;
   if (allowedOrigins.includes(origin || '') || !origin) {
-    res.header('Access-Control-Allow-Origin', origin || '*');
+    res.header('Access-Control-Allow-Origin', origin || req.headers.host);
   }
   
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, Cookie');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, Cookie, Set-Cookie');
   res.header('Access-Control-Allow-Credentials', 'true');
+  res.header('Access-Control-Expose-Headers', 'Set-Cookie');
   
   if (req.method === 'OPTIONS') {
     res.sendStatus(200);
