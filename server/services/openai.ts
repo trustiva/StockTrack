@@ -8,11 +8,14 @@ const openai = new OpenAI({
 export async function generateProposal(
   project: Project,
   profile?: FreelancerProfile | null,
-  customInstructions?: string
+  customInstructions?: string,
+  projectType?: 'testing' | 'production'
 ): Promise<{
   content: string;
   bidAmount: string;
   timeline: string;
+  confidence: number;
+  keyPoints: string[];
 }> {
   try {
     const prompt = `
@@ -39,17 +42,23 @@ CUSTOM INSTRUCTIONS:
 ${customInstructions || 'None'}
 
 Generate a proposal that:
-1. Addresses the client's specific needs
-2. Highlights relevant experience and skills
-3. Suggests an appropriate bid amount and timeline
-4. Is professional yet personable
-5. Stands out from generic proposals
+1. Addresses the client's specific needs mentioned in the description
+2. Highlights relevant experience and skills from the freelancer profile
+3. Suggests an appropriate bid amount and timeline based on project scope
+4. Is professional yet personable with a compelling opening
+5. Stands out from generic proposals with specific project insights
+6. Includes a clear call-to-action
+7. Demonstrates understanding of project requirements
+
+${projectType === 'testing' ? 'This is for testing purposes - be extra detailed in analysis.' : ''}
 
 Respond with JSON in this exact format:
 {
-  "content": "The full proposal text",
-  "bidAmount": "Suggested bid amount as string",
-  "timeline": "Suggested timeline as string"
+  "content": "The full proposal text with compelling opening, detailed approach, relevant experience, and clear next steps",
+  "bidAmount": "Suggested bid amount as string with justification",
+  "timeline": "Realistic timeline with milestones",
+  "confidence": "Number 1-100 indicating confidence in this proposal approach",
+  "keyPoints": ["key_strength_1", "key_strength_2", "key_strength_3"]
 }
 `;
 
@@ -75,7 +84,9 @@ Respond with JSON in this exact format:
     return {
       content: result.content || "Failed to generate proposal content",
       bidAmount: result.bidAmount || project.budget || "To be discussed",
-      timeline: result.timeline || "To be discussed"
+      timeline: result.timeline || "To be discussed",
+      confidence: Math.min(100, Math.max(0, result.confidence || 75)),
+      keyPoints: result.keyPoints || ["Relevant experience", "Quality delivery", "Timely completion"]
     };
   } catch (error) {
     console.error("Error generating proposal:", error);

@@ -1,5 +1,6 @@
 import type { AutomationSettings, FreelancerProfile, InsertProject } from "@shared/schema";
 import { generateProjectMatchScore } from "./openai";
+import { geminiProjectDiscovery, type ProjectDiscoveryInput } from "./geminiService";
 
 // Mock project data for MVP - in production this would connect to real APIs
 const MOCK_PROJECTS = [
@@ -88,9 +89,28 @@ export async function searchProjects(
   profile?: FreelancerProfile | null
 ): Promise<InsertProject[]> {
   try {
-    // In production, this would call real APIs like Upwork, Freelancer, etc.
-    // For MVP, we're using mock data and filtering based on user preferences
-    
+    // Enhanced project discovery using Gemini AI
+    if (profile && settings) {
+      const searchCriteria: ProjectDiscoveryInput = {
+        skills: settings.preferredSkills || profile.skills || [],
+        experience: profile.experience || 'intermediate',
+        budget: settings.minBudget && settings.maxBudget ? {
+          min: Number(settings.minBudget),
+          max: Number(settings.maxBudget)
+        } : undefined,
+        excludeKeywords: settings.excludeKeywords || []
+      };
+
+      const enhancedMatches = await geminiProjectDiscovery.enhanceProjectDiscovery(profile, searchCriteria);
+      
+      // Convert enhanced matches back to InsertProject format with match scores
+      return enhancedMatches.map(match => ({
+        ...match.project,
+        matchScore: match.estimatedSuccessRate
+      }));
+    }
+
+    // Fallback to original logic if no profile/settings
     let filteredProjects = [...MOCK_PROJECTS];
     
     // Apply filters based on automation settings

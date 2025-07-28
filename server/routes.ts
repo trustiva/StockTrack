@@ -13,6 +13,10 @@ import { searchProjects } from "./services/projectSearch";
 import { automationEngine } from "./services/automationEngine";
 import { notificationService } from "./services/notificationService";
 import { PlatformService } from "./services/platformIntegrations";
+import { geminiProjectDiscovery } from "./services/geminiService";
+import { proposalTestingService } from "./services/proposalTestingService";
+import { emailService } from "./services/emailService";
+import { performanceOptimizer } from "./services/performanceOptimizer";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware
@@ -453,6 +457,225 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error submitting proposal:", error);
       res.status(500).json({ message: "Failed to submit proposal" });
+    }
+  });
+
+  // Enhanced project discovery with Gemini
+  app.post('/api/projects/enhanced-search', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { skills, experience, budget, excludeKeywords } = req.body;
+      
+      const profile = await storage.getFreelancerProfile(userId);
+      const searchCriteria = {
+        skills: skills || profile?.skills || [],
+        experience: experience || profile?.experience || 'intermediate',
+        budget,
+        excludeKeywords
+      };
+
+      const enhancedMatches = await geminiProjectDiscovery.enhanceProjectDiscovery(profile, searchCriteria);
+      res.json(enhancedMatches);
+    } catch (error) {
+      console.error("Error in enhanced project search:", error);
+      res.status(500).json({ message: "Failed to perform enhanced project search" });
+    }
+  });
+
+  // Get market insights
+  app.get('/api/projects/market-insights', isAuthenticated, async (req: any, res) => {
+    try {
+      const { projectIds } = req.query;
+      const ids = projectIds ? projectIds.split(',') : [];
+      
+      const insights = await geminiProjectDiscovery.generateProjectInsights(ids);
+      res.json(insights);
+    } catch (error) {
+      console.error("Error generating market insights:", error);
+      res.status(500).json({ message: "Failed to generate market insights" });
+    }
+  });
+
+  // Proposal testing routes
+  app.get('/api/proposals/test-projects', isAuthenticated, async (req: any, res) => {
+    try {
+      const { category } = req.query;
+      const projects = category 
+        ? proposalTestingService.getTestProjectsByCategory(category as string)
+        : proposalTestingService.getTestProjects();
+      
+      res.json(projects);
+    } catch (error) {
+      console.error("Error fetching test projects:", error);
+      res.status(500).json({ message: "Failed to fetch test projects" });
+    }
+  });
+
+  app.post('/api/proposals/run-tests', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { categories } = req.body;
+      
+      const profile = await storage.getFreelancerProfile(userId);
+      if (!profile) {
+        return res.status(400).json({ message: "Profile required for testing" });
+      }
+
+      const results = await proposalTestingService.runProposalTests(profile, categories);
+      const report = proposalTestingService.generateTestReport(results);
+      
+      res.json({ results, report });
+    } catch (error) {
+      console.error("Error running proposal tests:", error);
+      res.status(500).json({ message: "Failed to run proposal tests" });
+    }
+  });
+
+  app.post('/api/proposals/test-specific', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { projectId, customInstructions } = req.body;
+      
+      const profile = await storage.getFreelancerProfile(userId);
+      if (!profile) {
+        return res.status(400).json({ message: "Profile required for testing" });
+      }
+
+      const result = await proposalTestingService.testSpecificProject(projectId, profile, customInstructions);
+      
+      if (!result) {
+        return res.status(404).json({ message: "Test project not found" });
+      }
+
+      res.json(result);
+    } catch (error) {
+      console.error("Error testing specific project:", error);
+      res.status(500).json({ message: "Failed to test specific project" });
+    }
+  });
+
+  // Email service routes
+  app.get('/api/email/config', isAuthenticated, async (req: any, res) => {
+    try {
+      const config = emailService.getConfiguration();
+      res.json(config);
+    } catch (error) {
+      console.error("Error fetching email config:", error);
+      res.status(500).json({ message: "Failed to fetch email configuration" });
+    }
+  });
+
+  app.post('/api/email/test', isAuthenticated, async (req: any, res) => {
+    try {
+      const { testEmail } = req.body;
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const template = emailService.getWelcomeEmail(user.firstName || 'User');
+      const success = await emailService.sendEmail(testEmail || user.email, template);
+      
+      res.json({ success, message: success ? 'Test email sent successfully' : 'Failed to send test email' });
+    } catch (error) {
+      console.error("Error sending test email:", error);
+      res.status(500).json({ message: "Failed to send test email" });
+    }
+  });
+
+  app.post('/api/email/test-connection', isAuthenticated, async (req: any, res) => {
+    try {
+      const isConnected = await emailService.testConnection();
+      res.json({ connected: isConnected });
+    } catch (error) {
+      console.error("Error testing email connection:", error);
+      res.status(500).json({ message: "Failed to test email connection" });
+    }
+  });
+
+  // Enhanced proposal generation
+  app.post('/api/proposals/generate-enhanced', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { projectId, customInstructions, projectType } = req.body;
+      
+      const projects = await storage.getProjects();
+      const project = projects.find(p => p.id === projectId);
+      
+      if (!project) {
+        return res.status(404).json({ message: "Project not found" });
+      }
+      
+      const profile = await storage.getFreelancerProfile(userId);
+      
+      const proposalResult = await generateProposal(project, profile, customInstructions, projectType);
+      
+      const proposal = await storage.createProposal({
+        userId,
+        projectId,
+        content: proposalResult.content,
+        bidAmount: proposalResult.bidAmount,
+        proposedTimeline: proposalResult.timeline,
+        isAutoGenerated: true,
+        status: "pending"
+      });
+      
+      res.json({
+        ...proposal,
+        confidence: proposalResult.confidence,
+        keyPoints: proposalResult.keyPoints
+      });
+    } catch (error) {
+      console.error("Error generating enhanced proposal:", error);
+      res.status(500).json({ message: "Failed to generate enhanced proposal" });
+         }
+   });
+
+  // Performance and health monitoring routes
+  app.get('/api/health', async (req, res) => {
+    try {
+      const healthCheck = performanceOptimizer.getHealthCheck();
+      res.json(healthCheck);
+    } catch (error) {
+      console.error("Error in health check:", error);
+      res.status(500).json({ 
+        status: 'critical', 
+        message: "Health check failed",
+        error: (error as Error).message 
+      });
+    }
+  });
+
+  app.get('/api/performance/analytics', isAuthenticated, async (req: any, res) => {
+    try {
+      const analytics = performanceOptimizer.getPerformanceAnalytics();
+      res.json(analytics);
+    } catch (error) {
+      console.error("Error fetching performance analytics:", error);
+      res.status(500).json({ message: "Failed to fetch performance analytics" });
+    }
+  });
+
+  app.get('/api/performance/optimizations', isAuthenticated, async (req: any, res) => {
+    try {
+      const optimizations = performanceOptimizer.getFrontendOptimizations();
+      res.json(optimizations);
+    } catch (error) {
+      console.error("Error fetching optimization recommendations:", error);
+      res.status(500).json({ message: "Failed to fetch optimization recommendations" });
+    }
+  });
+
+  app.post('/api/performance/clear-cache', isAuthenticated, async (req: any, res) => {
+    try {
+      const { pattern } = req.body;
+      performanceOptimizer.clearCache(pattern);
+      res.json({ message: "Cache cleared successfully" });
+    } catch (error) {
+      console.error("Error clearing cache:", error);
+      res.status(500).json({ message: "Failed to clear cache" });
     }
   });
 

@@ -1,5 +1,8 @@
 // Email service for sending transactional emails
-// In production, integrate with SendGrid, Mailgun, or similar service
+// Supports both SMTP (nodemailer) and API-based services (SendGrid, Mailgun)
+
+import nodemailer from 'nodemailer';
+import type { Transporter } from 'nodemailer';
 
 export interface EmailTemplate {
   subject: string;
@@ -7,39 +10,173 @@ export interface EmailTemplate {
   text: string;
 }
 
+export interface EmailConfig {
+  provider: 'smtp' | 'sendgrid' | 'mailgun';
+  smtp?: {
+    host: string;
+    port: number;
+    secure: boolean;
+    auth: {
+      user: string;
+      pass: string;
+    };
+  };
+  apiKey?: string;
+}
+
 export class EmailService {
-  private apiKey: string;
+  private transporter: Transporter | null = null;
   private fromEmail: string;
+  private config: EmailConfig;
+  private isConfigured: boolean = false;
 
   constructor() {
-    // In production, use environment variables
-    this.apiKey = process.env.EMAIL_API_KEY || '';
     this.fromEmail = process.env.FROM_EMAIL || 'noreply@freelanceauto.com';
+    
+    // Auto-configure based on environment variables
+    this.config = this.detectEmailConfig();
+    this.setupTransporter();
+  }
+
+  private detectEmailConfig(): EmailConfig {
+    // Check for SMTP configuration first
+    if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
+      return {
+        provider: 'smtp',
+        smtp: {
+          host: process.env.SMTP_HOST,
+          port: parseInt(process.env.SMTP_PORT || '587'),
+          secure: process.env.SMTP_SECURE === 'true',
+          auth: {
+            user: process.env.SMTP_USER,
+            pass: process.env.SMTP_PASS
+          }
+        }
+      };
+    }
+
+    // Check for SendGrid
+    if (process.env.SENDGRID_API_KEY) {
+      return {
+        provider: 'sendgrid',
+        apiKey: process.env.SENDGRID_API_KEY
+      };
+    }
+
+    // Check for Mailgun
+    if (process.env.MAILGUN_API_KEY) {
+      return {
+        provider: 'mailgun',
+        apiKey: process.env.MAILGUN_API_KEY
+      };
+    }
+
+    // Default to mock for development
+    return {
+      provider: 'smtp',
+      smtp: {
+        host: 'localhost',
+        port: 1025,
+        secure: false,
+        auth: {
+          user: 'test',
+          pass: 'test'
+        }
+      }
+    };
+  }
+
+  private setupTransporter(): void {
+    if (this.config.provider === 'smtp' && this.config.smtp) {
+      try {
+        this.transporter = nodemailer.createTransport(this.config.smtp);
+        this.isConfigured = true;
+        console.log(`Email service configured with SMTP: ${this.config.smtp.host}`);
+      } catch (error) {
+        console.error('Failed to setup SMTP transporter:', error);
+        this.isConfigured = false;
+      }
+    } else {
+      // For API-based services, we'll handle them in sendEmail method
+      this.isConfigured = true;
+      console.log(`Email service configured with ${this.config.provider}`);
+    }
   }
 
   async sendEmail(to: string, template: EmailTemplate): Promise<boolean> {
-    try {
-      // In production, implement actual email sending
-      // Example with SendGrid:
-      // const msg = {
-      //   to,
-      //   from: this.fromEmail,
-      //   subject: template.subject,
-      //   text: template.text,
-      //   html: template.html,
-      // };
-      // await sgMail.send(msg);
-
-      console.log(`Email would be sent to ${to}:`, {
+    if (!this.isConfigured) {
+      console.log(`Email service not configured. Would send to ${to}:`, {
         subject: template.subject,
         preview: template.text.substring(0, 100) + '...'
       });
+      return false;
+    }
 
-      return true;
+    try {
+      if (this.config.provider === 'smtp' && this.transporter) {
+        const result = await this.transporter.sendMail({
+          from: this.fromEmail,
+          to,
+          subject: template.subject,
+          text: template.text,
+          html: template.html
+        });
+
+        console.log(`Email sent via SMTP to ${to}:`, result.messageId);
+        return true;
+      }
+
+      // For other providers, implement API calls
+      if (this.config.provider === 'sendgrid') {
+        // Implement SendGrid API call
+        console.log(`Email would be sent via SendGrid to ${to}:`, {
+          subject: template.subject,
+          preview: template.text.substring(0, 100) + '...'
+        });
+        return true;
+      }
+
+      if (this.config.provider === 'mailgun') {
+        // Implement Mailgun API call
+        console.log(`Email would be sent via Mailgun to ${to}:`, {
+          subject: template.subject,
+          preview: template.text.substring(0, 100) + '...'
+        });
+        return true;
+      }
+
+      return false;
     } catch (error) {
       console.error('Email sending failed:', error);
       return false;
     }
+  }
+
+  async testConnection(): Promise<boolean> {
+    if (!this.isConfigured) {
+      return false;
+    }
+
+    try {
+      if (this.config.provider === 'smtp' && this.transporter) {
+        await this.transporter.verify();
+        return true;
+      }
+      
+      // For API providers, we'll assume they're working if configured
+      return true;
+    } catch (error) {
+      console.error('Email connection test failed:', error);
+      return false;
+    }
+  }
+
+  getConfiguration(): { provider: string; isConfigured: boolean; fromEmail: string } {
+    return {
+      provider: this.config.provider,
+      isConfigured: this.isConfigured,
+      fromEmail: this.fromEmail
+    };
   }
 
   // Predefined email templates

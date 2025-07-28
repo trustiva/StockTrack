@@ -1,6 +1,7 @@
 import { db } from "../db";
 import { notifications, users, type InsertNotification } from "@shared/schema";
 import { eq, desc, and } from "drizzle-orm";
+import { emailService } from "./emailService";
 
 export interface EmailNotification {
   to: string;
@@ -81,7 +82,7 @@ export class NotificationService {
       ));
   }
 
-  // Send email notification (in real app, would use service like SendGrid)
+  // Send email notification using the email service
   private async sendEmailNotification(userId: string, notification: any) {
     try {
       // Get user email
@@ -95,30 +96,24 @@ export class NotificationService {
         return;
       }
 
-      // In a real application, you would integrate with an email service
-      // For now, we'll just log the email that would be sent
-      const emailContent = this.generateEmailContent(notification);
+      // Generate email content based on notification type
+      const emailTemplate = this.generateEmailTemplate(notification);
       
-      console.log('Email notification would be sent:', {
-        to: user.email,
-        subject: emailContent.subject,
-        content: emailContent.text
-      });
-
-      // Example integration with a real email service:
-      // await this.emailProvider.send({
-      //   to: user.email,
-      //   subject: emailContent.subject,
-      //   html: emailContent.html,
-      //   text: emailContent.text
-      // });
+      // Send email using the email service
+      const success = await emailService.sendEmail(user.email, emailTemplate);
+      
+      if (success) {
+        console.log(`Email notification sent to ${user.email}: ${notification.title}`);
+      } else {
+        console.log(`Failed to send email notification to ${user.email}: ${notification.title}`);
+      }
 
     } catch (error) {
       console.error('Failed to send email notification:', error);
     }
   }
 
-  private generateEmailContent(notification: any): EmailNotification {
+  private generateEmailTemplate(notification: any): { subject: string; html: string; text: string } {
     const baseUrl = process.env.BASE_URL || 'http://localhost:5000';
     
     let subject = '';
@@ -159,7 +154,6 @@ export class NotificationService {
     }
 
     return {
-      to: '',
       subject,
       text,
       html
@@ -172,14 +166,14 @@ export class NotificationService {
     const allUsers = await db.select({ id: users.id }).from(users);
     
     // Create notification for each user
-    const notifications = allUsers.map(user => ({
+    const notificationData = allUsers.map(user => ({
       userId: user.id,
       title,
       message,
       type: 'system'
     }));
 
-    await db.insert(notifications).values(notifications as any);
+    await db.insert(notifications).values(notificationData as any);
   }
 
   // Real-time notification helpers (for WebSocket integration)
