@@ -1,0 +1,16 @@
+# Environment Variables for Vercel Deployment
+# Copy these to your Vercel project settings under Environment Variables
+
+DATABASE_URL=your_neon_database_url_here
+SESSION_SECRET=your_secure_session_secret_here
+OPENAI_API_KEY=your_openai_api_key_here
+REPL_ID=your_replit_repl_id_here
+ISSUER_URL=https://replit.com/oidc
+
+# Instructions:
+# 1. In Vercel dashboard, go to your project Settings > Environment Variables
+# 2. Add each variable with its corresponding value
+# 3. Make sure to set these for Production, Preview, and Development environments
+# 4. The DATABASE_URL should point to your Neon database connection string
+# 5. SESSION_SECRET should be a random 32+ character string
+# 6. OPENAI_API_KEY is required for AI proposal generation features

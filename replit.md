@@ -15,7 +15,9 @@ Preferred communication style: Simple, everyday language.
 - Configured PostgreSQL database with full schema deployment
 - Set up authentication system with Replit Auth and session management
 - All core services operational: project discovery, proposal generation, automation engine
-- Platform ready for further development and feature enhancements
+- **Added Vercel deployment support**: Complete Vercel configuration with serverless functions
+- **Production-ready deployment**: Build process optimized, environment variables configured
+- Platform ready for both development and production deployment
 
 ## System Architecture
 
@@ -150,6 +152,13 @@ Preferred communication style: Simple, everyday language.
 - **Frontend**: Vite builds optimized React bundle to `dist/public`
 - **Backend**: esbuild bundles Node.js server to `dist/index.js`
 - **Assets**: Static files served from `dist/public`
+
+### Vercel Deployment
+- **Configuration**: `vercel.json` configures serverless functions and routing
+- **API Routes**: Serverless function at `/api/index.ts` handles all backend requests
+- **Build Command**: `vite build` generates production-ready frontend
+- **Environment Variables**: Configured via Vercel dashboard (see `vercel-env-template.txt`)
+- **Deployment Guide**: Detailed instructions in `deploy.md`
 
 ### Environment Variables
 - `DATABASE_URL`: PostgreSQL connection string (required)
