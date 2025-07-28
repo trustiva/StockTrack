@@ -1,10 +1,14 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import { performanceOptimizer } from "./services/performanceOptimizer";
 
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
+// Add performance monitoring
+app.use(performanceOptimizer.createPerformanceMiddleware());
 
 app.use((req, res, next) => {
   const start = Date.now();
@@ -67,5 +71,8 @@ app.use((req, res, next) => {
     reusePort: true,
   }, () => {
     log(`serving on port ${port}`);
+    
+    // Start performance optimization cleanup
+    performanceOptimizer.startPeriodicCleanup();
   });
 })();
