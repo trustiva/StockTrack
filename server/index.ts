@@ -4,6 +4,31 @@ import { setupVite, serveStatic, log } from "./vite";
 import { performanceOptimizer } from "./services/performanceOptimizer";
 
 const app = express();
+
+// Add CORS headers
+app.use((req, res, next) => {
+  const allowedOrigins = [
+    'http://localhost:5000',
+    'https://9d17f577-ed02-4a4d-9a91-c46ed5a360f0-00-1zz21d4zj2ra2.janeway.replit.dev',
+    'https://9d17f577-ed02-4a4d-9a91-c46ed5a360f0-00-1zz21d4zj2ra2.janeway.replit.dev:5000'
+  ];
+  
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin) || !origin) {
+    res.header('Access-Control-Allow-Origin', origin || '*');
+  }
+  
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, Cookie');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  
+  if (req.method === 'OPTIONS') {
+    res.sendStatus(200);
+  } else {
+    next();
+  }
+});
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
